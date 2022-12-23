@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>omo_r2mini</name>
+  <version>0.0.0</version>
+  <description>Meta package for omo_r2mini.</description>
+  <maintainer email="kucira00@gmail.com">Dr.K</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>omo_r2mini_teleop</depend>
+  <depend>omo_r2mini_description</depend>
+  <!--
+  <depend>omo_r2mini_bringup</depend>-->
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
