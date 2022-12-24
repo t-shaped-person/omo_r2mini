@@ -23,7 +23,6 @@ Moving around:
         w
     a   s   d
         x
-
 w/x: increase/decrease linear velocity (omo_r2mini: ~0.3m/s)
 a/d: increase/decrease angular velocity (omo_r2mini: ~3.5rad/s)
 space, s: force stop
@@ -36,6 +35,7 @@ class teleop_keyboard(Node):
         super().__init__('teleop_keyboard')                                     # node name
         qos_profile = QoSProfile(depth=10)                                      # que size 10
         self.publisher = self.create_publisher(Twist, 'cmd_vel', qos_profile)   # message type: Twist, topic name: cmd_vel
+        self.settings = termios.tcgetattr(sys.stdin)
 
     def publish(self, msg):
         self.publisher.publish(msg)
@@ -50,7 +50,7 @@ class teleop_keyboard(Node):
         tty.setraw(sys.stdin.fileno())
         select.select([sys.stdin], [], [], 0.1)
         key = sys.stdin.read(1)
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, termios.tcgetattr(sys.stdin))
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
         return key
     
     def smooth_accel_decel(self, current_vel, target_vel, slop):
@@ -75,23 +75,23 @@ def main():
             if key == 'w' or key.lower() == 'w':
                 target_lin_vel = node.constrain(target_lin_vel+STEP_LIN_VEL, -MAX_LIN_VEL, MAX_LIN_VEL)
                 keyin_cnt += 1
-                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}\r')
+                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}')
             elif key == 'x' or key.lower() == 'x':
                 target_lin_vel = node.constrain(target_lin_vel-STEP_LIN_VEL, -MAX_LIN_VEL, MAX_LIN_VEL)
                 keyin_cnt += 1
-                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}\r')
+                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}')
             elif key == 'a' or key.lower() == 'a':
                 target_ang_vel = node.constrain(target_ang_vel+STEP_ANG_VEL, -MAX_ANG_VEL, MAX_ANG_VEL)
                 keyin_cnt += 1
-                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}\r')
+                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}')
             elif key == 'd' or key.lower() == 'd':
                 target_ang_vel = node.constrain(target_ang_vel-STEP_ANG_VEL, -MAX_ANG_VEL, MAX_ANG_VEL)
                 keyin_cnt += 1
-                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}\r')
+                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}')
             elif key == ' ' or key == 's' or key.lower() == 's':
                 target_lin_vel, target_ang_vel, current_lin_vel, current_ang_vel = 0.0, 0.0, 0.0, 0.0
                 keyin_cnt += 1
-                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}\r')
+                node.print(f'current velocity:\tlinear {target_lin_vel:.2f}\t angular {target_ang_vel:.2f}')
             else:
                 if key == '\x03':
                     break
@@ -113,7 +113,7 @@ def main():
         node.publish(twist)
         node.destroy_node()
         rclpy.shutdown()
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, termios.tcgetattr(sys.stdin))
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, node.settings)
 
 
 if __name__ == '__main__':
